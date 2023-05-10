@@ -13,8 +13,22 @@
 		"vscode": "^1.43.0"
 	},
 	"activationEvents": [
+		"onLanguage:axml",
 		"onLanguage:javascript"
 	],
+	"contributes": {
+		"languages": [
+			{
+				"id": "axml",
+				"aliases": [
+					"AXML"
+				],
+				"extensions": [
+					".axml"
+				]
+			}
+		]
+	},
 	"main": "./client/out/extension",
 	"scripts": {
 		"vscode:prepublish": "npm run compile",

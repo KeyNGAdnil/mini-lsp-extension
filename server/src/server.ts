@@ -10,6 +10,7 @@ import {
   TextDocumentSyncKind,
   InsertTextFormat,
   Position,
+  Range
 } from 'vscode-languageserver/node';
 
 import { TextDocument } from 'vscode-languageserver-textdocument';
@@ -28,7 +29,10 @@ connection.onInitialize((params: InitializeParams) => {
       textDocumentSync: TextDocumentSyncKind.Incremental,
       completionProvider: {
         resolveProvider: true,
-        triggerCharacters: ['.', 'm'],
+        triggerCharacters: [
+          'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
+          'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', ' ', '.'
+        ],
       },
     },
   };
@@ -95,12 +99,37 @@ connection.onCompletion(
         console.log('触发了tb');
         return completionItems;
       }
+
+      if (lineText.endsWith('o')) {
+        const completionItem1: CompletionItem[] = [];
+        const attributes = [
+          'onTap',
+          'onHover',
+          // 添加其他属性
+        ];
+
+        attributes.forEach((attr) => {
+          const item = CompletionItem.create(attr);
+          item.kind = CompletionItemKind.Property;
+          item.textEdit = {
+            range: Range.create(
+              Position.create(position.line, position.character),
+              Position.create(position.line, position.character),
+            ),
+            newText: `${attr}=""`,
+          };
+          completionItem1.push(item);
+        });
+        console.log('触发了', completionItem1);
+        return completionItem1;
+      }
       return []
     }
 
     return [];
   }
 );
+
 // 设置选择时 补齐代码文档信息
 connection.onCompletionResolve((item) => {
   if (item.label === 'myProperty') {

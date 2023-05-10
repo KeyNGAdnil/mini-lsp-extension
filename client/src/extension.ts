@@ -50,7 +50,11 @@ export function activate(context: ExtensionContext) {
 	// Options to control the language client
 	const clientOptions: LanguageClientOptions = {
 		// 定义插件在什么时候生效
-		documentSelector: [{ scheme: 'file', language: 'javascript' }],
+		documentSelector: [
+			{ scheme: 'file', language: 'javascript' },
+			{ scheme: 'file', language: 'axml' }
+		],
+
 		synchronize: {
 			// Notify the server about file changes to '.clientrc files contained in the workspace
 			fileEvents: workspace.createFileSystemWatcher('**/.clientrc')
