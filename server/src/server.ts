@@ -14,7 +14,7 @@ import {
 } from 'vscode-languageserver/node';
 
 import { TextDocument } from 'vscode-languageserver-textdocument';
-
+import { config } from './mock/mock'
 // 创建连接
 const connection = createConnection(ProposedFeatures.all);
 const documents: TextDocuments<TextDocument> = new TextDocuments(TextDocument);
@@ -29,44 +29,29 @@ connection.onInitialize((params: InitializeParams) => {
       textDocumentSync: TextDocumentSyncKind.Incremental,
       completionProvider: {
         resolveProvider: true,
-        triggerCharacters: [
-          'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
-          'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', ' ', '.'
-        ],
+        triggerCharacters: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.'.split('')
       },
     },
   };
 });
 
-// 提示项
-const completionItems: CompletionItem[] = [
-  {
-    label: 'tb',
-    kind: CompletionItemKind.Method,
-    detail: 'My custom method',
-    insertText: 'tb',
-  },
-  {
-    label: 'myMethod',
-    kind: CompletionItemKind.Method,
-    detail: 'My custom method',
-    insertText: 'myMethod()',
-  },
-  {
-    label: 'myProperty',
-    kind: CompletionItemKind.Method,
-    detail: 'My custom property',
-    insertText: 'myConfigData()',
-  },
-];
-const myCompletionItems: CompletionItem[] = [
-  {
-    label: 'my',
-    kind: CompletionItemKind.Method,
-    detail: 'My custom method',
-    insertText: 'my',
-  },
-];
+
+function findChildrenByPath(searchPath: string) {
+  const trimmedPath = searchPath.replace(/\.$/, ''); // 去除末尾的点号
+  const pathSegments = trimmedPath.split('.');
+  let currentChildren: any = config;
+
+  for (const segment of pathSegments) {
+    const foundChild = currentChildren.find((child: any) => child.label === segment);
+    if (foundChild && foundChild.children) {
+      currentChildren = foundChild.children;
+    } else {
+      return [];
+    }
+  }
+
+  return currentChildren;
+}
 
 
 // 提示功能
@@ -74,56 +59,23 @@ connection.onCompletion(
   (params: CompletionParams): CompletionItem[] => {
     const document = documents.get(params.textDocument.uri);
     const position = params.position;
-
     if (document) {
-      // const text = document.getText();
 
-      // 在此处根据具体逻辑判断是否触发代码补全
-      // 获取光标前的文本
       const lineText = document.getText({
         start: { line: position.line, character: 0 },
         end: position,
       });
-      if (lineText.endsWith('m')) {
-        console.log('触发了m');
-        console.log('myCompletionItems', myCompletionItems);
-        return myCompletionItems;
-      }
-      // 检查光标前的文本是否以 "my." 结尾
-      if (lineText.endsWith('my.')) {
-        console.log('触发了my');
-        // console.log('completionItems', completionItems);
-        return completionItems;
-      }
-      if (lineText.endsWith('tb.')) {
-        console.log('触发了tb');
-        return completionItems;
+      console.log(lineText);
+      const res = findChildrenByPath(lineText);
+
+      // 第一层调用，如my直接返回config
+      if (res.length === 0 && !lineText.includes('.')) {
+        console.log('====>', config);
+        return config
       }
 
-      if (lineText.endsWith('o')) {
-        const completionItem1: CompletionItem[] = [];
-        const attributes = [
-          'onTap',
-          'onHover',
-          // 添加其他属性
-        ];
-
-        attributes.forEach((attr) => {
-          const item = CompletionItem.create(attr);
-          item.kind = CompletionItemKind.Property;
-          item.textEdit = {
-            range: Range.create(
-              Position.create(position.line, position.character),
-              Position.create(position.line, position.character),
-            ),
-            newText: `${attr}=""`,
-          };
-          completionItem1.push(item);
-        });
-        console.log('触发了', completionItem1);
-        return completionItem1;
-      }
-      return []
+      console.log('====>', res);
+      return res;
     }
 
     return [];
