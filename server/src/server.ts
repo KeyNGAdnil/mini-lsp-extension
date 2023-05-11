@@ -41,6 +41,7 @@ function findChildrenByPath(searchPath: string) {
   const pathSegments = trimmedPath.split('.');
   let currentChildren: any = config;
 
+  // 每次循环就是在树的一层寻找当前层级节点是否含有下一个层级节点的children
   for (const segment of pathSegments) {
     const foundChild = currentChildren.find((child: any) => child.label === segment);
     if (foundChild && foundChild.children) {

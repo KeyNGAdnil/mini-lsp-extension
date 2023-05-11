@@ -16,6 +16,20 @@ export const config = [
             {
                 label: 'getSetting',
                 innerText: 'getSetting()',
+            },
+            {
+                label: 'getA',
+                innerText: 'getA()',
+                children: [
+                    {
+                        label: 'getConfigDataA',
+                        innerText: 'getConfigDataA()',
+                    }
+                ]
+            },
+            {
+                label: 'getB',
+                innerText: 'getB()',
             }
         ]
     },
