@@ -40,14 +40,15 @@ function findChildrenByPath(searchPath: string) {
   const trimmedPath = searchPath.replace(/\.$/, ''); // 去除末尾的点号
   const pathSegments = trimmedPath.split('.');
   let currentChildren: any = config;
-
+  // console.log(pathSegments);
   // 每次循环就是在树的一层寻找当前层级节点是否含有下一个层级节点的children
   for (const segment of pathSegments) {
     const foundChild = currentChildren.find((child: any) => child.label === segment);
+    // console.log('foundChild', foundChild);
     if (foundChild && foundChild.children) {
       currentChildren = foundChild.children;
     } else {
-      return [];
+      return currentChildren;
     }
   }
 
@@ -66,16 +67,16 @@ connection.onCompletion(
         start: { line: position.line, character: 0 },
         end: position,
       });
-      console.log(lineText);
+      console.log("触发", lineText);
       const res = findChildrenByPath(lineText);
 
       // 第一层调用，如my直接返回config
       if (res.length === 0 && !lineText.includes('.')) {
-        console.log('====>', config);
+        // console.log('====>', config);
         return config
       }
 
-      console.log('====>', res);
+      // console.log('====>', res);
       return res;
     }
 
