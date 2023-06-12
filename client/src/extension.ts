@@ -4,7 +4,7 @@
  * ------------------------------------------------------------------------------------------ */
 
 import * as path from 'path';
-import { workspace, ExtensionContext, languages, CompletionItem, CompletionItemKind } from 'vscode';
+import { workspace, ExtensionContext, languages, CompletionItem, CompletionItemKind, window } from 'vscode';
 
 import {
 	LanguageClient,
@@ -16,6 +16,11 @@ import {
 let client: LanguageClient;
 
 export function activate(context: ExtensionContext) {
+	
+	workspace.onDidSaveTextDocument((document) => {
+		const lineCount = document.lineCount;
+		window.showInformationMessage(`Total lines of code: ${lineCount}`);
+	});
 	// The server is implemented in node
 	const serverModule = context.asAbsolutePath(
 		path.join('server', 'out', 'server.js')
